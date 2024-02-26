@@ -2,7 +2,11 @@ package org.example;
 import java.util.*;
 
 public class Calculator {
-
+    public static boolean isValidExpression(String expression) {
+        // Regular expression to match valid characters (numbers and operators)
+        String validCharsRegex = "^[0-9+\\-*/().\\s]+$";
+        return expression.matches(validCharsRegex);
+    }
     static int precedence(char c) {
         if (c == '/' || c == '*')
             return 2;
@@ -41,16 +45,42 @@ public class Calculator {
         while (!stack.isEmpty()) {
             result.append(stack.pop());
         }
-        System.out.println(result);
         String res = result.toString();
         return res;
     }
 
-    public static boolean isValidExpression(String expression) {
-        // Regular expression to match valid characters (numbers and operators)
-        String validCharsRegex = "^[0-9+\\-*/().\\s]+$";
-        return expression.matches(validCharsRegex);
+
+    //Evaluation of the postfix notation
+    static int evaluateRPN(String exp)
+    {
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 0; i < exp.length(); i++) {
+            char c = exp.charAt(i);
+            if (Character.isDigit(c))
+                stack.push(c - '0');
+            else {
+                int op1 = stack.pop();
+                int op2 = stack.pop();
+                switch (c) {
+                    case '+':
+                        stack.push(op1 + op2);
+                        break;
+                    case '-':
+                        stack.push(op2 - op1);
+                        break;
+                    case '/':
+                        stack.push(op2 / op1);
+                        break;
+                    case '*':
+                        stack.push(op2 * op1);
+                        break;
+                }
+            }
+        }
+        return stack.pop();
     }
+
+
 
     public static void main(String[] args) {
         System.out.println("*********** CLI CALCULATOR APPLICATION ***********");
@@ -71,8 +101,8 @@ public class Calculator {
                     //2. Evaluate the postfix notaion.
                     String rpnExpression = infixToRPN(input);
                     System.out.println("Reverse Polish Notation (RPN): " + rpnExpression);
-//                    double result = evaluateRPN(rpnExpression);
-// System.out.println("Result: " + result);
+                    double result = evaluateRPN(rpnExpression);
+                    System.out.println("Result: " + result);
 
                 } else {
                     System.out.println("Error: Invalid characters in the expression,\nPlease enter valid expression");
